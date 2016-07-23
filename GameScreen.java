@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class GameScreen implements Screen {
 	SpriteBatch batch;
-	Texture player;
 	OrthographicCamera cam;
 	Rectangle rectangle;
 	JTB game;
@@ -44,6 +43,10 @@ public class GameScreen implements Screen {
 		delta *= speed;
 		world.update(delta);
 		renderer.render();
+		if(world.dead){
+			game.setScreen(new MainMenuScreen(game));
+			dispose();
+		}
 	}
 
 	@Override
@@ -68,7 +71,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		player.dispose();
-		batch.dispose();
+		renderer.dispose();
 	}
 }

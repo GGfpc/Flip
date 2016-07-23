@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.ArrayList;
 
@@ -17,10 +18,13 @@ public class Baddie extends Scrollable {
     GameWorld world;
     ArrayList<Drop> drops = new ArrayList<>();
     int count;
+    Vector3 touchpos;
+    float rotation;
 
     public Baddie(int x, int width, int height, GameWorld world) {
 
         super(x, (int) world.hero.position.y, width, height, 0);
+        touchpos = new Vector3(0,0,0);
         hitbox = new Rectangle(x,super.position.y,height,width);
         isVisible = false;
         this.world = world;
@@ -28,6 +32,7 @@ public class Baddie extends Scrollable {
 
     @Override
     public void update(float delta) {
+        System.out.println(rotation);
         position.y = world.hero.position.y + 70;
         count++;
         super.update(delta);
@@ -37,22 +42,52 @@ public class Baddie extends Scrollable {
         hitbox.setPosition(super.position);
 
 
+        if(Gdx.input.isTouched()){
+            int activeTouch = 0;
+            for (int i = 0; i < 2; i++) {
+                if (Gdx.input.isTouched(i)) activeTouch++;
+            }
+
+            if(activeTouch == 2){
+                if(world.JUMPS > 0) {
+                    Drop drop = new Drop((int) position.x, (int) position.y, 10, 20, world);
+                    drops.add(drop);
+                }
+            } else {
+                world.render.cam.unproject(touchpos.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+                float camWidth = world.render.cam.viewportWidth;
+                if (touchpos.x > camWidth / 2) {
+                    position.x += 8;
+                    rotation = -30;
+                } else  if (touchpos.x < camWidth / 2){
+                    position.x -= 8;
+                    rotation = 30;
+                }
+            }
+
+        } else{
+            rotation = 0;
+        }
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                Drop drop = new Drop((int) position.x, (int) position.y, 10, 20, world);
+            if(world.JUMPS > 0) {
+                Drop drop = new Drop((int) position.x +5, (int) position.y-10, 10, 20, world);
                 drops.add(drop);
-
+            }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             position.x -= 10;
+            rotation = 30;
 
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             position.x += 10;
-
+            rotation = -30;
+        } else{
+            //rotation = 0;
         }
+
 
 
     }

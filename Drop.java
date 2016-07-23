@@ -23,10 +23,12 @@ public class Drop extends Scrollable {
         speed = new Vector2(0,-700);
         acceleration = new Vector2(-4050,0);
         this.world = world;
+        world.JUMPS--;
     }
 
     public void checkHeroColision(Hero hero) {
         if (collides(hero)) {
+            hero.isJumping = true;
             hero.jump();
         }
     }

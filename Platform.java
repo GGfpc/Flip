@@ -23,29 +23,33 @@ public class Platform extends Scrollable {
 
     public void checkHeroColision(Hero hero){
         if (collides(hero)) {
-            Rectangle intersection = new Rectangle();
-            Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);
+            if (hero.ignorecol) {
+                hero.ignorecol = false;
+            } else {
+                hero.isJumping = false;
+                Rectangle intersection = new Rectangle();
+                Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);
 
-            if (intersection.width > intersection.height){
-                if(hero.position.y >= intersection.y){
-                    hero.position.y = position.y + height + 2;
-                    hero.isJumping = false;
-                }else{
-                    hero.position.y = position.y - hero.height - 0.01f;
+                if (intersection.width > intersection.height) {
+                    if (hero.position.y >= intersection.y) {
+                        hero.landing = false;
+                        hero.position.y = position.y + height + 2;
+                    } else {
+                        hero.position.y = position.y - hero.height - 0.01f;
+                    }
+                } else if (intersection.height >= intersection.width && hero.position.x < position.x) {
+                    hero.position.x = position.x - hero.width;
                 }
-            } else if(intersection.height >= intersection.width && hero.position.x < position.x){
-                hero.position.x = position.x - hero.width;
-            }
 
+            }
         }
     }
 
     public void checkDropColision(Drop drop){
-        if (Intersector.overlaps(drop.hitbox,hitbox)) {
+        if (Intersector.overlaps(drop.hitbox, hitbox)) {
             Rectangle intersection = new Rectangle();
             Intersector.intersectRectangles(hitbox, drop.hitbox, intersection);
             if (intersection.width > intersection.height){
-                System.out.println("sim");
                 drop.position.y = position.y + height;
                 drop.position.x = intersection.x;
                 drop.acceleration = new Vector2(0,0);
@@ -53,6 +57,17 @@ public class Platform extends Scrollable {
                 drop.speed.y = 0;
             } else if(intersection.height >= intersection.width && drop.position.x < position.x){
                 drop.position.x = position.x - drop.width;
+            }
+
+        }
+    }
+
+    public void checkStarColision(Star star){
+        if (Intersector.overlaps(star.hitbox,hitbox)) {
+            Rectangle intersection = new Rectangle();
+            Intersector.intersectRectangles(hitbox, star.hitbox, intersection);
+            if (intersection.width > intersection.height){
+                star.position.y = position.y + height + 5;
             }
 
         }
