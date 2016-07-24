@@ -26,6 +26,11 @@ public class Platform extends Scrollable {
             if (hero.ignorecol) {
                 hero.ignorecol = false;
             } else {
+                if(hero.isJumping){
+                    if(hero.jumpPosition.y > hero.position.y + 30){
+                        world.render.remainingShakes = 20;
+                    }
+                }
                 hero.isJumping = false;
                 Rectangle intersection = new Rectangle();
                 Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);

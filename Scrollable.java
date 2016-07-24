@@ -13,6 +13,7 @@ public class Scrollable {
     int height;
     Vector2 position;
     Vector2 speed;
+    Vector2 tmp;
     boolean isVisible;
 
     public Scrollable(int x, int y, int width, int height,float scrollspeed) {
@@ -20,12 +21,15 @@ public class Scrollable {
         this.height = height;
         position = new Vector2(x,y);
         speed = new Vector2(scrollspeed,0);
+        tmp = new Vector2(0,0);
         isVisible = true;
     }
 
     public void update(float delta){
-        position.sub(speed.cpy().scl(delta));
-        if(position.x + width < 0){
+        tmp.set(speed);
+        tmp.scl(delta);
+        position.sub(tmp);
+        if(position.x + width < 0 || position.y + height < 0){
             isVisible = false;
         }
     }

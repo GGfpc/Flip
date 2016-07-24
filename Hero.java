@@ -15,19 +15,24 @@ public class Hero {
     Vector2 position;
     Vector2 speed;
     Vector2 acceleration;
+    Vector2 tmp;
+    Vector2 jumpPosition;
     Rectangle hitbox;
     int gravity;
     boolean landing;
     boolean isJumping;
     boolean ignorecol;
+    float rotation;
 
     public Hero(int x, int y, int width, int height) {
         this.width = width;
         this.height = height;
         position = new Vector2(x,y);
+        jumpPosition = new Vector2(0,0);
         speed = new Vector2(0,0);
         acceleration = new Vector2(0,-980);
         hitbox = new Rectangle(x,y,width,height);
+        tmp = new Vector2(0,0);
         ignorecol = true;
 
     }
@@ -35,7 +40,10 @@ public class Hero {
     public void update(float delta){
 
 
-        speed.add(acceleration.cpy().scl(delta));
+
+        tmp.set(acceleration);
+        tmp.scl(delta);
+        speed.add(tmp);
         if(speed.y < -600){
             speed.y = -600;
         }
@@ -47,7 +55,8 @@ public class Hero {
             gravity = 0;
             acceleration.y = -980;
         }
-
+        tmp.set(speed);
+        tmp.scl(delta);
         position.add(speed.cpy().scl(delta));
         hitbox.setPosition(position.x, position.y);
 
@@ -77,7 +86,7 @@ public class Hero {
         landing = true;
         ignorecol = true;
         isJumping = true;
-
+        jumpPosition.set(position);
         speed.y = 825;
     }
 }

@@ -1,20 +1,25 @@
 package com.jtbgame;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool.Poolable;
+
 
 /**
  * Created by ggarc_000 on 19/07/2016.
  */
-public class Drop extends Scrollable {
+public class Drop extends Scrollable implements Poolable {
 
     Rectangle hitbox;
     GameWorld world;
     Vector2 position;
     Vector2 speed;
     Vector2 acceleration;
+    Vector2 tmp;
     int gravity;
+    boolean isVisible;
 
     public Drop(int x, int y, int width, int height, GameWorld world) {
         super(x, y, width, height, 500);
@@ -23,7 +28,8 @@ public class Drop extends Scrollable {
         speed = new Vector2(0,-700);
         acceleration = new Vector2(-4050,0);
         this.world = world;
-        world.JUMPS--;
+        isVisible = true;
+        tmp = new Vector2(0,0);
     }
 
     public void checkHeroColision(Hero hero) {
@@ -33,6 +39,14 @@ public class Drop extends Scrollable {
         }
     }
 
+    public void init(float x, float y){
+        position.set(x,y);
+        isVisible = true;
+        world.JUMPS--;
+        speed.set(0, -700);
+        acceleration.set(-4050, 0);
+    }
+
     @Override
     public boolean collides(Hero hero) {
         return Intersector.overlaps(hero.hitbox,hitbox);
@@ -40,9 +54,13 @@ public class Drop extends Scrollable {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
+      //  super.update(delta);
+        System.out.println(isVisible);
         checkHeroColision(world.hero);
-        speed.add(acceleration.cpy().scl(delta));
+
+        tmp.set(acceleration);
+        tmp.scl(delta);
+        speed.add(tmp);
         if(speed.y < -700){
             speed.y = -700;
         }
@@ -55,7 +73,18 @@ public class Drop extends Scrollable {
             acceleration.y = -980;
         }
 
-        position.add(speed.cpy().scl(delta));
+        tmp.set(speed);
+        tmp.scl(delta);
+        position.add(tmp);
         hitbox.setPosition(position.x, position.y);
+        if(position.x + width < 0 || position.y + height < 0){
+            isVisible = false;
+        }
+
+    }
+
+    @Override
+    public void reset() {
+        position.y = 5000;
     }
 }

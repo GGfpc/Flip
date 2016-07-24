@@ -1,6 +1,9 @@
 package com.jtbgame;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
+import com.badlogic.gdx.utils.Pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,20 +15,35 @@ import java.util.Random;
 public class GameWorld {
 
     Hero hero;
+    Baddie baddie;
+
+
     Scrollable bg;
     Scrollable bg2;
     Scrollable bg3;
     Scrollable bg4;
-    ArrayList<Platform> plats = new ArrayList<>();
+
+
+
     ArrayList<Star> stars = new ArrayList<>();
+    Pool<Star> starPool = new Pool<Star>() {
+        @Override
+
+        protected Star newObject() {
+            return new Star(0,5000,40,40,20);
+        }
+    };
+
+    ArrayList<Platform> plats = new ArrayList<>();
     ArrayList<Platform> hiddentplats = new ArrayList<>();
     Platform lastReset;
     Platform plat;
     Platform plat7;
     Platform plat3;
     Platform plat4;
+
     BitmapFont font;
-    Baddie baddie;
+
     float GAMESPEED = 600;
     int JUMPS = 100;
 
@@ -33,7 +51,7 @@ public class GameWorld {
     boolean dead;
 
     public GameWorld(){
-        hero = new Hero(50,500,30,63);
+        hero = new Hero(50,600,30,63);
         baddie = new Baddie(0,32,32,this);
         bg = new Scrollable(0,-100,1167,597,20);
         bg2 = new Scrollable(0,-100,1167,597,20);
@@ -41,10 +59,10 @@ public class GameWorld {
         bg4 = new Scrollable(-300,-200,1167,597,10);
 
         font = new BitmapFont();
-        plat = new Platform(50,-300,1000,500,GAMESPEED,0,this);
-        plat7 = new Platform(550 ,-300,800,500,GAMESPEED,1,this);
-        plat3 = new Platform(1250,-300,1300,500,GAMESPEED,2,this);
-        plat4 = new Platform(1550,-300,1500,500,GAMESPEED,3,this);
+        plat = new Platform(50,-400,1000,500,GAMESPEED,0,this);
+        plat7 = new Platform(550 ,-400,900,500,GAMESPEED,1,this);
+        plat3 = new Platform(1250,-400,1300,500,GAMESPEED,2,this);
+        plat4 = new Platform(1550,-400,1500,500,GAMESPEED,3,this);
         plats.add(plat4);
         plats.add(plat3);
         plats.add(plat);
@@ -52,6 +70,8 @@ public class GameWorld {
 
         int i = 0;
         //speed = 4;
+
+        GLProfiler.enable();
     }
 
     public int getMaxHeight(){
@@ -73,8 +93,8 @@ public class GameWorld {
 
         int newY = player + (downUp * offset);
 
-        if (newY > 550)
-            newY = 550;
+        if (newY > 450)
+            newY = 450;
         if (newY < 150)
             newY = 150;
         return newY - 500;
@@ -95,6 +115,7 @@ public class GameWorld {
     public void update(float delta) {
         GAMESPEED += 0.1f;
 
+
         bg.update(delta);
         if(!bg.isVisible)bg.reset(1300);
         bg2.update(delta);
@@ -107,8 +128,8 @@ public class GameWorld {
         hero.update(delta);
         baddie.update(delta);
 
-       for (Platform plat : plats){
-
+       for (int i = 0; i < plats.size(); i++){
+            Platform plat = plats.get(i);
             plat.update(delta);
 
             plat.checkHeroColision(hero);
@@ -125,11 +146,16 @@ public class GameWorld {
             }
         }
 
-        for (Star s : stars){
+        for (int i = 0; i< stars.size(); i++){
+            Star s = stars.get(i);
             s.update(delta);
             s.checkHeroColision(hero);
             for(Platform p : plats){
                 p.checkStarColision(s);
+            }
+            if(!s.isVisible){
+                stars.remove(s);
+                starPool.free(s);
             }
         }
 
@@ -162,7 +188,8 @@ public class GameWorld {
                 height += 70;
             }
             if(rand * 0 == 0) {
-                Star s = new Star(xpos, height + 40, 40, 40, 20, this);
+                Star s = starPool.obtain();
+                s.init(xpos, height + 40, this);
                 stars.add(s);
             }
             lastReset = next;

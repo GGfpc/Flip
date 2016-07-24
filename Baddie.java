@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pool;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,14 @@ public class Baddie extends Scrollable {
     boolean isvisible;
     GameWorld world;
     ArrayList<Drop> drops = new ArrayList<>();
+
+    Pool<Drop> dropPool = new Pool<Drop>() {
+        @Override
+        protected Drop newObject() {
+            return new Drop(0,5000,10,20,world);
+        }
+    };
+
     int count;
     Vector3 touchpos;
     float rotation;
@@ -32,7 +41,7 @@ public class Baddie extends Scrollable {
 
     @Override
     public void update(float delta) {
-        System.out.println(rotation);
+
         position.y = world.hero.position.y + 70;
         count++;
         super.update(delta);
@@ -50,7 +59,8 @@ public class Baddie extends Scrollable {
 
             if(activeTouch == 2){
                 if(world.JUMPS > 0) {
-                    Drop drop = new Drop((int) position.x, (int) position.y, 10, 20, world);
+                    Drop drop = dropPool.obtain();
+                    drop.init(position.x +5, position.y-10);
                     drops.add(drop);
                 }
             } else {
@@ -69,13 +79,26 @@ public class Baddie extends Scrollable {
             rotation = 0;
         }
 
+        for(int i = 0; i < drops.size(); i++){
+
+            if(!drops.get(i).isVisible){
+
+                dropPool.free(drops.get(i));
+                drops.remove(drops.get(i));
+            }
+        }
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if(world.JUMPS > 0) {
-                Drop drop = new Drop((int) position.x +5, (int) position.y-10, 10, 20, world);
+                System.out.println("drop");
+                Drop drop = dropPool.obtain();
+                drop.init(position.x +5, position.y-10);
                 drops.add(drop);
             }
         }
+
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             position.x -= 10;
