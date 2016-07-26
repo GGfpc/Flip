@@ -11,14 +11,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
-
-
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 
 public class GameScreen implements Screen {
 	SpriteBatch batch;
 	OrthographicCamera cam;
 	Rectangle rectangle;
+	Viewport view;
 	JTB game;
 	GameWorld world;
 	GameRenderer renderer;
@@ -29,7 +31,11 @@ public class GameScreen implements Screen {
 	public GameScreen(JTB game){
 		this.game = game;
 		world = new GameWorld();
-		renderer = new GameRenderer(world);
+		cam = new OrthographicCamera();
+		cam.setToOrtho(false, 1024, 600);
+		renderer = new GameRenderer(world,view,cam);
+		view = new ExtendViewport(1024,600,cam);
+		view.apply();
 		speed = 1f;
     }
 
@@ -51,6 +57,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
+		view.update(width,height);
 
 	}
 

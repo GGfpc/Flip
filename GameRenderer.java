@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
 
 import org.w3c.dom.Text;
 
@@ -24,7 +27,6 @@ import java.util.logging.Filter;
 public class GameRenderer {
 
     GameWorld world;
-    OrthographicCamera cam;
     SpriteBatch batch;
     Texture player;
     Texture bad;
@@ -51,6 +53,7 @@ public class GameRenderer {
     Animation shipanim;
     float elapsed;
     Vector3 heropos;
+    OrthographicCamera cam;
 
 
     float x;
@@ -58,7 +61,7 @@ public class GameRenderer {
     int remainingShakes = 5;
 
 
-    public GameRenderer(GameWorld world) {
+    public GameRenderer(GameWorld world, Viewport view,OrthographicCamera cam) {
         this.world = world;
         world.render = this;
         heropos = new Vector3(0,0,0);
@@ -81,7 +84,6 @@ public class GameRenderer {
         herojump = new TextureAtlas(Gdx.files.internal("jumpsprite/jump.atlas"));
         jumpanim = new Animation(1/13f,herojump.getRegions());
         batch = new SpriteBatch();
-
         platform = new Texture(Gdx.files.internal("plat1000.png"));
         platform.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         platform7 = new Texture(Gdx.files.internal("plat900.png"));
@@ -92,8 +94,7 @@ public class GameRenderer {
         platform4.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         drop = new Texture(Gdx.files.internal("drop.png"));
         star = new Texture(Gdx.files.internal("star.png"));
-        cam = new OrthographicCamera();
-        cam.setToOrtho(false, 1024, 600);
+        this.cam = cam;
         x = cam.position.x;
         y = cam.position.y;
         font = new BitmapFont();

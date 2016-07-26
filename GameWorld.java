@@ -51,7 +51,7 @@ public class GameWorld {
     boolean dead;
 
     public GameWorld(){
-        hero = new Hero(50,600,30,63);
+        hero = new Hero(50,1000,30,63);
         baddie = new Baddie(0,32,32,this);
         bg = new Scrollable(0,-100,1167,597,20);
         bg2 = new Scrollable(0,-100,1167,597,20);
@@ -112,6 +112,15 @@ public class GameWorld {
     }
 
 
+    public void shuffle(ArrayList list){
+        Random random = new Random(list.size());
+
+        for(int index = 0; index < list.size(); index += 1) {
+            Collections.swap(list, index, index + random.nextInt(list.size() - index));
+        }
+    }
+
+
     public void update(float delta) {
         GAMESPEED += 0.1f;
 
@@ -160,7 +169,7 @@ public class GameWorld {
         }
 
         if(hiddentplats.size() >= 2) {
-            Collections.shuffle(hiddentplats);
+            shuffle(hiddentplats);
             Platform next = hiddentplats.get(0);
             hiddentplats.remove(0);
             int newX;
