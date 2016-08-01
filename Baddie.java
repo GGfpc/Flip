@@ -18,6 +18,7 @@ public class Baddie extends Scrollable {
     boolean isvisible;
     GameWorld world;
     ArrayList<Drop> drops = new ArrayList<>();
+    Rectangle intersection = new Rectangle();
 
     Pool<Drop> dropPool = new Pool<Drop>() {
         @Override
@@ -37,6 +38,7 @@ public class Baddie extends Scrollable {
         hitbox = new Rectangle(x,super.position.y,height,width);
         isVisible = false;
         this.world = world;
+        
     }
 
     @Override
@@ -121,7 +123,7 @@ public class Baddie extends Scrollable {
 
     public void checkColision(Hero hero){
         if (collides(hero)) {
-            Rectangle intersection = new Rectangle();
+
             Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);
 
 

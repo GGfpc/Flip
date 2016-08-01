@@ -23,8 +23,11 @@ public class Hero {
     boolean isJumping;
     boolean ignorecol;
     float rotation;
+    GameWorld world;
+    Vector2 futurepos = new Vector2(0,0);
 
-    public Hero(int x, int y, int width, int height) {
+
+    public Hero(int x, int y, int width, int height, GameWorld world) {
         this.width = width;
         this.height = height;
         position = new Vector2(x,y);
@@ -34,6 +37,7 @@ public class Hero {
         hitbox = new Rectangle(x,y,width,height);
         tmp = new Vector2(0,0);
         ignorecol = true;
+        this.world = world;
 
     }
 
@@ -57,11 +61,18 @@ public class Hero {
         }
         tmp.set(speed);
         tmp.scl(delta);
-        position.add(speed.cpy().scl(delta));
+        position.add(tmp);
+        futurepos.set(position);
+        futurepos.sub(tmp);
+        futurepos.sub(tmp);
         hitbox.setPosition(position.x, position.y);
 
         if (position.y < -50){
             position.y = -50;
+        }
+
+        for(Platform plat : world.plats){
+            plat.checkHeroColision(this);
         }
 
        /* if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {

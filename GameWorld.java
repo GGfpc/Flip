@@ -1,6 +1,7 @@
 package com.jtbgame;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.utils.Pool;
@@ -23,9 +24,12 @@ public class GameWorld {
     Scrollable bg3;
     Scrollable bg4;
 
+    ArrayList<Danger> dangers = new ArrayList<>();
+
 
 
     ArrayList<Star> stars = new ArrayList<>();
+
     Pool<Star> starPool = new Pool<Star>() {
         @Override
 
@@ -49,9 +53,10 @@ public class GameWorld {
 
     GameRenderer render;
     boolean dead;
+    Random r = new Random();
 
     public GameWorld(){
-        hero = new Hero(50,1000,30,63);
+        hero = new Hero(50,500,30,63,this);
         baddie = new Baddie(0,32,32,this);
         bg = new Scrollable(0,-100,1167,597,20);
         bg2 = new Scrollable(0,-100,1167,597,20);
@@ -60,9 +65,9 @@ public class GameWorld {
 
         font = new BitmapFont();
         plat = new Platform(50,-400,1000,500,GAMESPEED,0,this);
-        plat7 = new Platform(550 ,-400,900,500,GAMESPEED,1,this);
-        plat3 = new Platform(1250,-400,1300,500,GAMESPEED,2,this);
-        plat4 = new Platform(1550,-400,1500,500,GAMESPEED,3,this);
+        plat7 = new Platform(1050 ,-400,900,500,GAMESPEED,1,this);
+        plat3 = new Platform(1950,-400,1300,500,GAMESPEED,2,this);
+        plat4 = new Platform(3250,-400,1500,500,GAMESPEED,3,this);
         plats.add(plat4);
         plats.add(plat3);
         plats.add(plat);
@@ -123,7 +128,7 @@ public class GameWorld {
 
     public void update(float delta) {
         GAMESPEED += 0.1f;
-
+        System.out.println(Gdx.graphics.getFramesPerSecond());
 
         bg.update(delta);
         if(!bg.isVisible)bg.reset(1300);
@@ -134,26 +139,51 @@ public class GameWorld {
         bg4.update(delta);
         if(!bg4.isVisible)bg4.reset(1300);
 
+
         hero.update(delta);
-        baddie.update(delta);
 
-       for (int i = 0; i < plats.size(); i++){
-            Platform plat = plats.get(i);
-            plat.update(delta);
+        for (Danger d : dangers){
+            d.update(delta);
+        }
 
-            plat.checkHeroColision(hero);
+       for (int i = 0; i < plats.size(); i++) {
+           Platform plat = plats.get(i);
+           plat.update(delta);
+          // plat.checkHeroColision(hero);
+          if(hero.position.x > plat.position.x && plat.inDanger){
+
+               if(plat.width > 1300 && r.nextInt() % 15 == 0) {
+                   Danger g = new Danger((int) plat.position.x + plat.width, plat.height + 500, 30, 30, GAMESPEED + 300);
+                   dangers.add(g);
+                   plat.inDanger = false;
+               }
+           }
+
+
+
+          for(Danger d : dangers){
+               plat.checkDangerColision(d);
+               if(d.collides(hero)) dead = true;
+           }
+
            for(Drop drop : baddie.drops){
                plat.checkDropColision(drop);
            }
-            if (!plat.isVisible) {
-                if (!hiddentplats.contains(plat)){
-                    hiddentplats.add(plat);
-                 }
 
 
 
-            }
-        }
+           if (!plat.isVisible) {
+               if (!hiddentplats.contains(plat)) {
+                   hiddentplats.add(plat);
+               }
+
+           }
+       }
+
+        baddie.update(delta);
+
+
+
 
         for (int i = 0; i< stars.size(); i++){
             Star s = stars.get(i);
@@ -176,14 +206,14 @@ public class GameWorld {
             int gap = 0;
             int height;
             if (lastReset == null) {
-                newX = 1300;
+                newX = 3400;
                 height = next.height + (int) next.position.y + 40;
             } else {
                 newX = maxInterval();
                 gap = newX - ((int)lastReset.position.x + lastReset.width);
                 height = lastReset.height + (int) lastReset.position.y;
             }
-            Random r = new Random();
+
 
             next.reset(newX, maxJumpHeight());
 

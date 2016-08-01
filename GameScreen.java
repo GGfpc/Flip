@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
 		cam = new OrthographicCamera();
 		cam.setToOrtho(false, 1024, 600);
 		renderer = new GameRenderer(world,view,cam);
-		view = new ExtendViewport(1024,600,cam);
+		view = new ExtendViewport(1024	,600,cam);
 		view.apply();
 		speed = 1f;
     }
@@ -46,7 +46,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		delta *= speed;
 		world.update(delta);
 		renderer.render();
 		if(world.dead){

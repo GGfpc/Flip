@@ -2,7 +2,6 @@ package com.jtbgame;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,14 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
-
-import org.w3c.dom.Text;
-
-import java.util.Random;
-import java.util.logging.Filter;
 
 
 /**
@@ -55,10 +47,11 @@ public class GameRenderer {
     Vector3 heropos;
     OrthographicCamera cam;
 
-
+    int shake;
     float x;
     float y;
-    int remainingShakes = 5;
+    int remainingrolls = 5;
+    int remainingShakes = 20;
 
 
     public GameRenderer(GameWorld world, Viewport view,OrthographicCamera cam) {
@@ -95,6 +88,7 @@ public class GameRenderer {
         drop = new Texture(Gdx.files.internal("drop.png"));
         star = new Texture(Gdx.files.internal("star.png"));
         this.cam = cam;
+        bad = new Texture(Gdx.files.internal("baddie.png"));
         x = cam.position.x;
         y = cam.position.y;
         font = new BitmapFont();
@@ -107,7 +101,8 @@ public class GameRenderer {
 
 		batch.begin();
         batch.draw(SUN, -10, 0);
-        batch.draw(mountain4, world.bg4.position.x, world.bg4.position.y,784*2,299*2);
+
+        batch.draw(mountain4, world.bg4.position.x, world.bg4.position.y,784*2,299);
         batch.draw(mountain2, world.bg2.position.x, world.bg2.position.y, 1100, 600);
         batch.draw(mountain, world.bg.position.x, world.bg.position.y,1100,600);
         batch.draw(mountain3, world.bg3.position.x, world.bg3.position.y, 1100, 600);
@@ -120,16 +115,16 @@ public class GameRenderer {
         batch.draw(platform4, world.plat4.position.x, world.plat4.position.y+2,world.plat4.hitbox.width,world.plat4.hitbox.height);
         batch.draw(platform3, world.plat3.position.x, world.plat3.position.y+2, world.plat3.hitbox.width, world.plat3.hitbox.height);
         elapsed += Gdx.graphics.getDeltaTime();
-        System.out.println(world.hero.isJumping);
+
         if(world.hero.isJumping){
             if(world.hero.rotation > -15) {
                 world.hero.rotation-=0.5;
             }
             batch.draw(jumpanim.getKeyFrame(elapsed, true), world.hero.position.x, world.hero.position.y,world.hero.hitbox.width / 2.0f, world.hero.hitbox.height /2.0f,64,64,1,1,world.hero.rotation);
-        } else if(remainingShakes > 0){
+        } else if(remainingrolls > 0){
             world.hero.rotation = 0;
             batch.draw(rollanim.getKeyFrame(elapsed, true), world.hero.position.x, world.hero.position.y,world.hero.hitbox.width / 2.0f, world.hero.hitbox.height /2.0f,64,64,1,1,world.hero.rotation);
-            remainingShakes--;
+            remainingrolls--;
         } else {
             world.hero.rotation = 0;
             batch.draw(heroanim.getKeyFrame(elapsed, true), world.hero.position.x, world.hero.position.y);
@@ -146,26 +141,56 @@ public class GameRenderer {
         }
         font.draw(batch, "" + world.JUMPS, 100, 500);
 
+        for (Danger d : world.dangers){
+            batch.draw(bad, d.position.x, d.position.y);
+            if(d.state == 0){
+                camShake(cam,1);
+            } else if(d.state == 1){
+                if(remainingShakes > 0) {
+                    camShake(cam, 10);
+                    remainingShakes--;
+                }
+                if(remainingShakes == 0){
+                    remainingShakes = 20;
+                    d.state = 2;
+                }
+            } else if(d.state == 2){
+                camShake(cam,0);
+            }
+        }
 
         batch.end();
 
 
         if(world.hero.position.y > 450){
-            heropos.set(x, world.hero.position.y - 100, 0);
+            heropos.set(x, world.hero.position.y - 50, 0);
             cam.position.lerp(heropos,0.3f);
         } else {
             heropos.set(x,y,0);
             cam.position.lerp(heropos,0.3f);
         }
-            cam.update();
+
+        camShake(cam,shake);
+        cam.update();
+
 
     }
 
-    public void camShake(OrthographicCamera cam){
-        Random rand = new Random();
-        //int y = rand.nextInt(50);
-        int y = 50;
-        cam.position.y += y;
+    public void camShake(OrthographicCamera cam, float size){
+
+        float shakeFreqX = 10;
+        float shakeFreqY = 8;
+        float shakeFreqY2 = 20;
+        float shakeSizeX =  size;
+        float shakeSizeY =  size;
+        float shakeSizeY2 = size;
+        float t = elapsed;
+        float xAdjustment = (float) (Math.sin(t * 60)*shakeSizeX);
+        float yAdjustment = (float) (Math.sin(t * 60)*shakeSizeY + Math.cos(t * shakeFreqY2)*shakeSizeY2);
+        cam.position.x += xAdjustment;
+        cam.position.y += yAdjustment;
+        cam.update();
+
     }
 
     public void dispose(){
