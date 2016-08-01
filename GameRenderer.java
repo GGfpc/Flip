@@ -2,6 +2,7 @@ package com.jtbgame;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -46,6 +47,7 @@ public class GameRenderer {
     float elapsed;
     Vector3 heropos;
     OrthographicCamera cam;
+    SpriteBatch UI;
 
     int shake;
     float x;
@@ -91,14 +93,15 @@ public class GameRenderer {
         bad = new Texture(Gdx.files.internal("baddie.png"));
         x = cam.position.x;
         y = cam.position.y;
-        font = new BitmapFont();
+        font = world.font;
+        font.setColor(153 / 255.0f,217 / 255.0f,254/ 255.0f,100);
+        font.getData().setScale(0.5f);
     }
 
     public void render(){
         Gdx.gl.glClearColor(134 / 255.0f, 75 / 255.0f, 102 / 255.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.setProjectionMatrix(cam.combined);
-
 		batch.begin();
         batch.draw(SUN, -10, 0);
 
@@ -107,9 +110,8 @@ public class GameRenderer {
         batch.draw(mountain, world.bg.position.x, world.bg.position.y,1100,600);
         batch.draw(mountain3, world.bg3.position.x, world.bg3.position.y, 1100, 600);
 
-        batch.draw(shipanim.getKeyFrame(elapsed, true), world.baddie.position.x, world.baddie.position.y,world.baddie.hitbox.width / 2.0f, world.baddie.hitbox.height /2.0f, world.baddie.hitbox.width, world.baddie.hitbox.height,1,1,world.baddie.rotation);
+        batch.draw(shipanim.getKeyFrame(elapsed, true), world.baddie.position.x, world.baddie.position.y, world.baddie.hitbox.width / 2.0f, world.baddie.hitbox.height / 2.0f, world.baddie.hitbox.width, world.baddie.hitbox.height, 1, 1, world.baddie.rotation);
 
-        font.draw(batch, "" + world.GAMESPEED, 500, 400);
         batch.draw(platform, world.plat.position.x, world.plat.position.y+2,world.plat.hitbox.width,world.plat.hitbox.height);
         batch.draw(platform7, world.plat7.position.x, world.plat7.position.y+2,world.plat7.hitbox.width,world.plat7.hitbox.height);
         batch.draw(platform4, world.plat4.position.x, world.plat4.position.y+2,world.plat4.hitbox.width,world.plat4.hitbox.height);
@@ -139,7 +141,6 @@ public class GameRenderer {
         for(Star s : world.stars) {
             batch.draw(star, s.position.x, s.position.y, s.hitbox.width, s.hitbox.height);
         }
-        font.draw(batch, "" + world.JUMPS, 100, 500);
 
         for (Danger d : world.dangers){
             batch.draw(bad, d.position.x, d.position.y);
@@ -158,8 +159,10 @@ public class GameRenderer {
                 camShake(cam,0);
             }
         }
-
+        font.draw(batch, "" + world.JUMPS, cam.position.x + (cam.viewportWidth / 3f) , cam.position.y + (cam.viewportHeight / 3f));
+        font.getData().setScale(0.5f);
         batch.end();
+
 
 
         if(world.hero.position.y > 450){

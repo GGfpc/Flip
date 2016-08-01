@@ -43,6 +43,7 @@ public class Drop extends Scrollable implements Poolable {
         position.set(x,y);
         isVisible = true;
         world.JUMPS--;
+        world.font.getData().setScale(0.6f);
         speed.set(0, -700);
         acceleration.set(-4050, 0);
     }

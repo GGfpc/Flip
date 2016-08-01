@@ -63,7 +63,9 @@ public class GameWorld {
         bg3 = new Scrollable(-1300,-100,1167,597,20);
         bg4 = new Scrollable(-300,-200,1167,597,10);
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("flipp2.fnt"));
+
+
         plat = new Platform(50,-400,1000,500,GAMESPEED,0,this);
         plat7 = new Platform(1050 ,-400,900,500,GAMESPEED,1,this);
         plat3 = new Platform(1950,-400,1300,500,GAMESPEED,2,this);

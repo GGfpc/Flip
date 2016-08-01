@@ -28,6 +28,7 @@ public class Star extends Scrollable implements Poolable {
     public void checkHeroColision(Hero hero) {
         if (collides(hero)) {
             world.JUMPS += 10;
+            world.font.getData().setScale(0.5f);
             position.y = -100;
         }
 
