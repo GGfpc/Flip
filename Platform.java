@@ -45,11 +45,8 @@ public class Platform extends Scrollable {
                 hero.isJumping = false;
                 //Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);
 
-
-
                 Intersector.intersectLines( hero.futurepos, hero.position, a,b, inters);
-                System.out.println(position.y + height);
-                System.out.println(inters);
+
                 if (inters != null) {
                     if (hero.futurepos. y >= position.y + height) {
                         hero.landing = false;

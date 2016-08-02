@@ -19,6 +19,9 @@ public class Baddie extends Scrollable {
     GameWorld world;
     ArrayList<Drop> drops = new ArrayList<>();
     Rectangle intersection = new Rectangle();
+    boolean canMove;
+    boolean canDrop;
+    boolean useDelta;
 
     Pool<Drop> dropPool = new Pool<Drop>() {
         @Override
@@ -43,7 +46,7 @@ public class Baddie extends Scrollable {
 
     @Override
     public void update(float delta) {
-
+        checkColision(world.refuel);
         position.y = world.hero.position.y + 70;
         count++;
         super.update(delta);
@@ -60,12 +63,10 @@ public class Baddie extends Scrollable {
             }
 
             if(activeTouch == 2){
-                if(world.JUMPS > 0) {
-                    Drop drop = dropPool.obtain();
-                    drop.init(position.x +5, position.y-10);
-                    drops.add(drop);
+                if(world.JUMPS > 0 && canDrop) {
+                    drop();
                 }
-            } else {
+            } else if(canMove) {
                 world.render.cam.unproject(touchpos.set(Gdx.input.getX(), Gdx.input.getY(), 0));
                 float camWidth = world.render.cam.viewportWidth;
                 if (touchpos.x > camWidth / 2) {
@@ -91,49 +92,51 @@ public class Baddie extends Scrollable {
         }
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && canDrop) {
             if(world.JUMPS > 0) {
-                System.out.println("drop");
-                Drop drop = dropPool.obtain();
-                drop.init(position.x +5, position.y-10);
-                drops.add(drop);
+                drop();
+            }
+        }
+
+        if(canMove) {
+
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                position.x -= 10;
+                rotation = 30;
+
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                position.x += 10;
+                rotation = -30;
+            } else {
+                //rotation = 0;
             }
         }
 
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            position.x -= 10;
-            rotation = 30;
+    }
 
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            position.x += 10;
-            rotation = -30;
-        } else{
-            //rotation = 0;
-        }
-
-
-
+    public void drop() {
+        Drop drop = dropPool.obtain();
+        drop.init(position.x +5, position.y-10);
+        drops.add(drop);
     }
 
     public void reset(){
         position.x = -200;
     }
 
-    public void checkColision(Hero hero){
-        if (collides(hero)) {
-
-            Intersector.intersectRectangles(hitbox, hero.hitbox, intersection);
-
-
-
-
+    public void checkColision(Refuel refuel){
+        if (collides(refuel)) {
+            System.out.println("brugh");
+            refuel.setX(-5000);
+            world.JUMPS += 30;
         }
+
     }
 
-    @Override
-    public boolean collides(Hero hero){
-        return Intersector.overlaps(hero.hitbox,hitbox);
+
+    public boolean collides(Refuel refuel){
+        return Intersector.overlaps(refuel.hitbox,hitbox);
     }
 }

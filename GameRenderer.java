@@ -2,6 +2,7 @@ package com.jtbgame;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class GameRenderer {
 
     GameWorld world;
+    Tutorial tut;
     SpriteBatch batch;
     Texture player;
     Texture bad;
@@ -33,6 +35,7 @@ public class GameRenderer {
     Texture mountain2;
     Texture mountain3;
     Texture mountain4;
+    Texture ref;
     Texture SUN;
     BitmapFont font;
     TextureAtlas heroatlas;
@@ -48,12 +51,17 @@ public class GameRenderer {
     Vector3 heropos;
     OrthographicCamera cam;
     SpriteBatch UI;
-
+    float runanimspeed = 1.0f / 12.0f;
+    BitmapFont tutorialFont;
+    boolean tutorial;
     int shake;
     float x;
     float y;
     int remainingrolls = 5;
     int remainingShakes = 20;
+    Preferences prf;
+    boolean shouldtTutorial;
+    BitmapFont highfont;
 
 
     public GameRenderer(GameWorld world, Viewport view,OrthographicCamera cam) {
@@ -71,6 +79,7 @@ public class GameRenderer {
         mountain3.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         mountain4 = new Texture(Gdx.files.internal("mountain4.png"));
         mountain4.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        ref = new Texture(Gdx.files.internal("ref.png"));
         SUN = new Texture(Gdx.files.internal("SUN.png"));
         heroatlas = new TextureAtlas(Gdx.files.internal("sprite/Hero.atlas"));
         shipatlas = new TextureAtlas(Gdx.files.internal("ship/ship.atlas"));
@@ -94,17 +103,31 @@ public class GameRenderer {
         x = cam.position.x;
         y = cam.position.y;
         font = world.font;
-        font.setColor(153 / 255.0f,217 / 255.0f,254/ 255.0f,100);
+
         font.getData().setScale(0.5f);
+        tutorialFont = new BitmapFont(Gdx.files.internal("flipp2black.fnt"));
+        tutorialFont.getData().setScale(0.5f);
+        tutorial = true;
+        highfont = new BitmapFont(Gdx.files.internal("flipp2black.fnt"));
+        highfont.getData().setScale(0.4f);
+        tutorial = true;
+
+        prf = Gdx.app.getPreferences("JTB");
+        if(prf.getInteger("Tutorial") == 1 || prf.getInteger("Tutorial") == 3){
+            shouldtTutorial = true;
+        }
+        world.BEST = prf.getInteger("BEST");
+
     }
 
     public void render(){
         Gdx.gl.glClearColor(134 / 255.0f, 75 / 255.0f, 102 / 255.0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.setProjectionMatrix(cam.combined);
+
 		batch.begin();
         batch.draw(SUN, -10, 0);
-
+        heroanim.setFrameDuration(runanimspeed);
         batch.draw(mountain4, world.bg4.position.x, world.bg4.position.y,784*2,299);
         batch.draw(mountain2, world.bg2.position.x, world.bg2.position.y, 1100, 600);
         batch.draw(mountain, world.bg.position.x, world.bg.position.y,1100,600);
@@ -159,8 +182,17 @@ public class GameRenderer {
                 camShake(cam,0);
             }
         }
-        font.draw(batch, "" + world.JUMPS, cam.position.x + (cam.viewportWidth / 3f) , cam.position.y + (cam.viewportHeight / 3f));
+        batch.draw(ref,world.refuel.position.x,world.refuel.position.y,world.refuel.width,world.refuel.height);
+        font.draw(batch, "" + world.JUMPS, cam.position.x + (cam.viewportWidth / 3f), cam.position.y + (cam.viewportHeight / 3f));
         font.getData().setScale(0.5f);
+        if(shouldtTutorial) {
+            tut.start();
+        } else {
+            tutorialFont.draw(batch, "SCORE: " + world.SCORE, cam.position.x - (cam.viewportWidth / 2.3f), cam.position.y + (cam.viewportHeight / 2.6f));
+            highfont.draw(batch, "BEST: " + world.BEST, cam.position.x - (cam.viewportWidth / 2.3f), cam.position.y + (cam.viewportHeight / 2.3f));
+        }
+        tutorialFont.getData().setScale(0.5f);
+        highfont.getData().setScale(0.4f);
         batch.end();
 
 

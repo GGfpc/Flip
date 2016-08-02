@@ -20,6 +20,7 @@ public class Drop extends Scrollable implements Poolable {
     Vector2 tmp;
     int gravity;
     boolean isVisible;
+    float d;
 
     public Drop(int x, int y, int width, int height, GameWorld world) {
         super(x, y, width, height, 500);
@@ -36,6 +37,9 @@ public class Drop extends Scrollable implements Poolable {
         if (collides(hero)) {
             hero.isJumping = true;
             hero.jump();
+            if(GameScreen.speed != 1){
+                GameScreen.speed = 1;
+            }
         }
     }
 
@@ -55,15 +59,18 @@ public class Drop extends Scrollable implements Poolable {
 
     @Override
     public void update(float delta) {
-      //  super.update(delta);
+        d = Gdx.graphics.getDeltaTime();
+        if(world.baddie.useDelta){
+            d = delta;
+        }
         System.out.println(isVisible);
         checkHeroColision(world.hero);
 
         tmp.set(acceleration);
-        tmp.scl(delta);
+        tmp.scl(d);
         speed.add(tmp);
-        if(speed.y < -700){
-            speed.y = -700;
+        if(speed.y < -600){
+            speed.y = -600;
         }
 
         if(speed.y > 0){
@@ -75,7 +82,7 @@ public class Drop extends Scrollable implements Poolable {
         }
 
         tmp.set(speed);
-        tmp.scl(delta);
+        tmp.scl(d);
         position.add(tmp);
         hitbox.setPosition(position.x, position.y);
         if(position.x + width < 0 || position.y + height < 0){

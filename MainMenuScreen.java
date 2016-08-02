@@ -37,9 +37,14 @@ public class MainMenuScreen implements Screen {
         camera.update();
         game.batch.begin();
         game.batch.setProjectionMatrix(camera.combined);
-        game.font.draw(game.batch, "Ola, tudo bem?", 100, 150);
-        game.font.draw(game.batch, "Carrega para continuar", 100, 100);
+        game.font.draw(game.batch, "Hello!", 100, 150);
+        game.font.draw(game.batch, "Press SPACE to Start and T to retry the tutorial", 100, 100);
         game.batch.end();
+
+        if(Gdx.input.isKeyPressed(Input.Keys.T)){
+            game.setScreen(new GameScreen(game,1));
+            dispose();
+        }
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             game.setScreen(new GameScreen(game));

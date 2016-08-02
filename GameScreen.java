@@ -25,6 +25,7 @@ public class GameScreen implements Screen {
 	GameWorld world;
 	GameRenderer renderer;
 	public static float speed;
+	Tutorial tut;
 
 
 
@@ -37,7 +38,24 @@ public class GameScreen implements Screen {
 		view = new ExtendViewport(1024	,600,cam);
 		view.apply();
 		speed = 1f;
+		tut = new Tutorial(world,renderer);
     }
+	public GameScreen(JTB game,int tutorialLevel){
+		this.game = game;
+		world = new GameWorld();
+		cam = new OrthographicCamera();
+		cam.setToOrtho(false, 1024, 600);
+		renderer = new GameRenderer(world,view,cam);
+		view = new ExtendViewport(1024	,600,cam);
+		view.apply();
+		speed = 1f;
+		renderer.shouldtTutorial = true;
+		tut = new Tutorial(world,renderer);
+		tut.first = true;
+		tut.second = false;
+		tut.third = false;
+	}
+
 
 	@Override
 	public void show() {
@@ -46,6 +64,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		delta*= speed;
 		world.update(delta);
 		renderer.render();
 		if(world.dead){
@@ -77,6 +96,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		renderer.prf.putInteger("BEST",world.BEST);
+		renderer.prf.flush();
 		renderer.dispose();
 	}
 }

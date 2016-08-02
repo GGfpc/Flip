@@ -18,7 +18,7 @@ public class GameWorld {
     Hero hero;
     Baddie baddie;
 
-
+    Refuel refuel;
     Scrollable bg;
     Scrollable bg2;
     Scrollable bg3;
@@ -50,6 +50,10 @@ public class GameWorld {
 
     float GAMESPEED = 600;
     int JUMPS = 100;
+    int SCORE = 0;
+    int BEST;
+    int bubble = 0;
+    int bestbubble = 0;
 
     GameRenderer render;
     boolean dead;
@@ -57,19 +61,19 @@ public class GameWorld {
 
     public GameWorld(){
         hero = new Hero(50,500,30,63,this);
-        baddie = new Baddie(0,32,32,this);
+        baddie = new Baddie(100,32,32,this);
         bg = new Scrollable(0,-100,1167,597,20);
         bg2 = new Scrollable(0,-100,1167,597,20);
         bg3 = new Scrollable(-1300,-100,1167,597,20);
         bg4 = new Scrollable(-300,-200,1167,597,10);
+        refuel = new Refuel(-4000,this);
+        font = new BitmapFont(Gdx.files.internal("flipp2blue.fnt"));
 
-        font = new BitmapFont(Gdx.files.internal("flipp2.fnt"));
 
-
-        plat = new Platform(50,-400,1000,500,GAMESPEED,0,this);
-        plat7 = new Platform(1050 ,-400,900,500,GAMESPEED,1,this);
-        plat3 = new Platform(1950,-400,1300,500,GAMESPEED,2,this);
-        plat4 = new Platform(3250,-400,1500,500,GAMESPEED,3,this);
+        plat = new Platform(50,-300,1000,500,GAMESPEED,0,this);
+        plat7 = new Platform(1050 ,-300,900,500,GAMESPEED,1,this);
+        plat3 = new Platform(2210,-300,1300,500,GAMESPEED,2,this);
+        plat4 = new Platform(3500,-300,1500,500,GAMESPEED,3,this);
         plats.add(plat4);
         plats.add(plat3);
         plats.add(plat);
@@ -78,7 +82,7 @@ public class GameWorld {
         int i = 0;
         //speed = 4;
 
-        GLProfiler.enable();
+
     }
 
     public int getMaxHeight(){
@@ -109,7 +113,11 @@ public class GameWorld {
 
     public int maxInterval(){
         int last = (int) lastReset.position.x + lastReset.width;
-        int offset = (int) (Math.random()*(500 + GAMESPEED));
+        int offset = (int) (Math.random()*300);
+        Random r = new Random();
+        if(r.nextInt() % 5 == 0){
+            offset = (int) GAMESPEED + 200;
+        }
         int finaldist = offset + last;
         //System.out.println(offset);
         if(finaldist < GAMESPEED) finaldist = (int) GAMESPEED;
@@ -130,7 +138,19 @@ public class GameWorld {
 
     public void update(float delta) {
         GAMESPEED += 0.1f;
-        System.out.println(Gdx.graphics.getFramesPerSecond());
+        System.out.println(SCORE);
+        if(JUMPS == 50 || JUMPS == 30 || JUMPS == 10){
+            refuel.setX(200 + (int)(Math.random() * 600));
+        }
+        if(bubble > 0) {
+            render.tutorialFont.getData().setScale(0.6f);
+            bubble--;
+        }
+
+        if(bestbubble > 0){
+            render.highfont.getData().setScale(0.5f);
+            bestbubble--;
+        }
 
         bg.update(delta);
         if(!bg.isVisible)bg.reset(1300);
@@ -154,7 +174,7 @@ public class GameWorld {
           // plat.checkHeroColision(hero);
           if(hero.position.x > plat.position.x && plat.inDanger){
 
-               if(plat.width > 1300 && r.nextInt() % 15 == 0) {
+               if(plat.width > 1300 && SCORE >= 10 && SCORE % 5 == 0 && r.nextInt() % 15 == 0) {
                    Danger g = new Danger((int) plat.position.x + plat.width, plat.height + 500, 30, 30, GAMESPEED + 300);
                    dangers.add(g);
                    plat.inDanger = false;
@@ -202,22 +222,25 @@ public class GameWorld {
 
         if(hiddentplats.size() >= 2) {
             shuffle(hiddentplats);
+            int jumpHeight;
             Platform next = hiddentplats.get(0);
             hiddentplats.remove(0);
             int newX;
             int gap = 0;
             int height;
             if (lastReset == null) {
-                newX = 3400;
+                newX = 4000;
                 height = next.height + (int) next.position.y + 40;
+                jumpHeight = -400;
             } else {
                 newX = maxInterval();
                 gap = newX - ((int)lastReset.position.x + lastReset.width);
                 height = lastReset.height + (int) lastReset.position.y;
+                jumpHeight = maxJumpHeight();
             }
 
 
-            next.reset(newX, maxJumpHeight());
+            next.reset(newX, jumpHeight);
 
             int rand = r.nextInt();
             int xpos;
@@ -228,10 +251,14 @@ public class GameWorld {
                 xpos = (int) (next.position.x + (next.width / 2));
                 height += 70;
             }
-            if(rand * 0 == 0) {
-                Star s = starPool.obtain();
-                s.init(xpos, height + 40, this);
-                stars.add(s);
+            if(rand % 10 == 0){
+               refuel.setX(200 + (int)(Math.random() * 600));
+            }
+            SCORE++;
+            bubble = 5;
+            if(BEST < SCORE){
+                BEST = SCORE;
+                bestbubble = 5;
             }
             lastReset = next;
 
