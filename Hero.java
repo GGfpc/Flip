@@ -16,49 +16,50 @@ public class Hero {
     Vector2 speed;
     Vector2 acceleration;
     Vector2 tmp;
-    Vector2 jumpPosition;
     Rectangle hitbox;
     int gravity;
-    boolean landing;
-    boolean isJumping;
-    boolean ignorecol;
     float rotation;
     GameWorld world;
     Vector2 futurepos = new Vector2(0,0);
+    boolean isJumping;
+    float elapsed;
+    boolean upDown;
 
 
     public Hero(int x, int y, int width, int height, GameWorld world) {
         this.width = width;
         this.height = height;
         position = new Vector2(x,y);
-        jumpPosition = new Vector2(0,0);
         speed = new Vector2(0,0);
+
+
         acceleration = new Vector2(0,-980);
+
         hitbox = new Rectangle(x,y,width,height);
         tmp = new Vector2(0,0);
-        ignorecol = true;
         this.world = world;
 
     }
 
     public void update(float delta){
-
-
-
         tmp.set(acceleration);
         tmp.scl(delta);
         speed.add(tmp);
-        if(speed.y < -600){
-            speed.y = -600;
+        System.out.println(speed.y  );
+        if(Math.abs(speed.y) > 600){
+            if(speed.y > 0) {
+                speed.y = 600;
+            }else{
+                speed.y = -600;
+            }
+        }
+        if(isJumping){
+            rotation -=5.5;
+        } else {
+            rotation = 0;
         }
 
-        if(speed.y > 0){
-            gravity++;
-            acceleration.y -= 10 * gravity;
-        } else {
-            gravity = 0;
-            acceleration.y = -980;
-        }
+        elapsed += delta;
         tmp.set(speed);
         tmp.scl(delta);
         position.add(tmp);
@@ -69,35 +70,52 @@ public class Hero {
 
         if (position.y < -50){
             position.y = -50;
+            world.dead = true;
+        }
+
+        if(position.y > 400){
+            position.y = 400;
+            world.dead = true;
         }
 
         for(Platform plat : world.plats){
             plat.checkHeroColision(this);
         }
 
-       /* if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            position.x -= 100 * Gdx.graphics.getDeltaTime();
-        }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            position.x += 100 * Gdx.graphics.getDeltaTime();
-        }
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
-            if(!isJumping) {
-                jump();
-            }
+            jump();
 
         }
-        */
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            flip();
+
+        }
 
 
     }
 
     public void jump(){
-        landing = true;
-        ignorecol = true;
-        isJumping = true;
-        jumpPosition.set(position);
-        speed.y = 825;
+        if(!isJumping) {
+            isJumping = true;
+            if(speed.y < 0){
+                speed.y = 400;
+            } else {
+                speed.y = -400;
+            }
+
+        }
+
+    }
+
+    public void flip(){
+        if(!isJumping) {
+            upDown = !upDown;
+            elapsed = 0;
+            isJumping = true;
+            acceleration.y *= -1;
+            speed.y = acceleration.y;
+        }
     }
 }

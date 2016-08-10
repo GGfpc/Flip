@@ -17,6 +17,7 @@ public class JTB extends Game {
     SpriteBatch batch;
     BitmapFont font;
 
+
     @Override
     public void create() {
 
@@ -27,7 +28,6 @@ public class JTB extends Game {
             prf.putInteger("Tutorial", 1);
         }
         if(!prf.contains("BEST")) {
-            System.out.println("l");
             prf.putInteger("BEST", 0);
         }
         prf.flush();

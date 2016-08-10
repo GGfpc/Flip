@@ -18,43 +18,26 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen implements Screen {
 	SpriteBatch batch;
-	OrthographicCamera cam;
-	Rectangle rectangle;
+	public static OrthographicCamera cam;
 	Viewport view;
 	JTB game;
 	GameWorld world;
 	GameRenderer renderer;
 	public static float speed;
-	Tutorial tut;
-
 
 
 	public GameScreen(JTB game){
 		this.game = game;
-		world = new GameWorld();
+
 		cam = new OrthographicCamera();
-		cam.setToOrtho(false, 1024, 600);
-		renderer = new GameRenderer(world,view,cam);
-		view = new ExtendViewport(1024	,600,cam);
+		cam.setToOrtho(false, 640, 360);
+		view = new ExtendViewport(640,360,cam);
 		view.apply();
-		speed = 1f;
-		tut = new Tutorial(world,renderer);
+		world = new GameWorld();
+		renderer = new GameRenderer(world,view,cam);
+
     }
-	public GameScreen(JTB game,int tutorialLevel){
-		this.game = game;
-		world = new GameWorld();
-		cam = new OrthographicCamera();
-		cam.setToOrtho(false, 1024, 600);
-		renderer = new GameRenderer(world,view,cam);
-		view = new ExtendViewport(1024	,600,cam);
-		view.apply();
-		speed = 1f;
-		renderer.shouldtTutorial = true;
-		tut = new Tutorial(world,renderer);
-		tut.first = true;
-		tut.second = false;
-		tut.third = false;
-	}
+
 
 
 	@Override
@@ -64,12 +47,10 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		delta*= speed;
 		world.update(delta);
 		renderer.render();
 		if(world.dead){
 			game.setScreen(new MainMenuScreen(game));
-			dispose();
 		}
 	}
 
@@ -96,8 +77,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		renderer.prf.putInteger("BEST",world.BEST);
-		renderer.prf.flush();
 		renderer.dispose();
 	}
 }

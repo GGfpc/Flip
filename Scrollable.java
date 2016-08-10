@@ -29,7 +29,7 @@ public class Scrollable {
         tmp.set(speed);
         tmp.scl(delta);
         position.sub(tmp);
-        if(position.x + width < 0 || position.y + height < 0){
+        if(position.x + width < 0){
             isVisible = false;
         }
     }

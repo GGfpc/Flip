@@ -41,10 +41,7 @@ public class MainMenuScreen implements Screen {
         game.font.draw(game.batch, "Press SPACE to Start and T to retry the tutorial", 100, 100);
         game.batch.end();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.T)){
-            game.setScreen(new GameScreen(game,1));
-            dispose();
-        }
+
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             game.setScreen(new GameScreen(game));
