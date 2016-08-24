@@ -2,6 +2,7 @@ package com.jtbgame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -39,13 +40,75 @@ public class Hero {
         tmp = new Vector2(0,0);
         this.world = world;
 
+        Gdx.input.setInputProcessor(new GestureDetector(new GestureDetector.GestureListener() {
+            @Override
+            public boolean touchDown(float x, float y, int pointer, int button) {
+
+                return false;
+            }
+
+            @Override
+            public boolean tap(float x, float y, int count, int button) {
+                jump();
+                System.out.println("jump");
+                return true;
+            }
+
+            @Override
+            public boolean longPress(float x, float y) {
+                return false;
+            }
+
+            @Override
+            public boolean fling(float velocityX, float velocityY, int button) {
+                System.out.println("fling");
+                if(Math.abs(velocityX)<Math.abs(velocityY)){
+                    if(velocityY < 0 && !upDown){
+                        flip();
+                        System.out.println("flipDown");
+                    }else if (velocityY > 0 && upDown){
+                        flip();
+                        System.out.println("flipUp");
+                    }
+                }
+                return true;
+            }
+
+            //<editor-fold desc="Description">
+            @Override
+            public boolean pan(float x, float y, float deltaX, float deltaY) {
+                return false;
+               }
+
+            @Override
+            public boolean panStop(float x, float y, int pointer, int button) {
+                return false;
+            }
+
+            @Override
+            public boolean zoom(float initialDistance, float distance) {
+                return false;
+            }
+
+            @Override
+            public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+                return false;
+            }
+
+            @Override
+            public void pinchStop() {
+
+            }
+            //</editor-fold>
+        }));
+
     }
 
     public void update(float delta){
         tmp.set(acceleration);
         tmp.scl(delta);
         speed.add(tmp);
-        System.out.println(speed.y  );
+
         if(Math.abs(speed.y) > 600){
             if(speed.y > 0) {
                 speed.y = 600;
@@ -83,7 +146,7 @@ public class Hero {
         }
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isTouched()) {
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             jump();
 
         }

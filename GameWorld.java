@@ -56,7 +56,7 @@ public class GameWorld {
         }
 
         int finaldist = last + offset;
-        System.out.println(offset);
+        //System.out.println(offset);
         return finaldist;
     }
 

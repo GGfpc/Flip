@@ -50,7 +50,7 @@ public class GameScreen implements Screen {
 		world.update(delta);
 		renderer.render();
 		if(world.dead){
-			game.setScreen(new MainMenuScreen(game));
+			//game.setScreen(new MainMenuScreen(game));
 		}
 	}
 
