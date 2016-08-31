@@ -15,6 +15,7 @@ public class Scrollable {
     Vector2 speed;
     Vector2 tmp;
     boolean isVisible;
+    boolean isOnScreen;
 
     public Scrollable(int x, int y, int width, int height,float scrollspeed) {
         this.width = width;
@@ -29,8 +30,13 @@ public class Scrollable {
         tmp.set(speed);
         tmp.scl(delta);
         position.sub(tmp);
-        if(position.x + width < 0){
+        if(position.x + width < -50){
             isVisible = false;
+        }
+        if(position.x + width < 0 || position.x > 640){
+            isOnScreen = false;
+        } else {
+            isOnScreen = true;
         }
     }
 

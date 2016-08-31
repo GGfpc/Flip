@@ -3,6 +3,7 @@ package com.jtbgame;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.sun.xml.internal.bind.v2.TODO;
 
 import java.util.Random;
 
@@ -34,16 +35,17 @@ public class Platform extends Scrollable {
     public void checkHeroColision(Hero hero) {
         if (collides(hero)) {
             Intersector.intersectLines(hero.futurepos, hero.position, a, b, inters);
-
             if (inters != null) {
                 hero.isJumping = false;
+                hero.currentplat = this;
+
                 if (hero.futurepos.y >= position.y + height) {
                     hero.position.set(hero.position.x, position.y + height);
-                   // hero.speed.set(0, 0);
+                    // hero.speed.set(0, 0);
                     hero.hitbox.setPosition(hero.position);
 
-                } else if(hero.futurepos.y <= position.y ) {
-                    hero.position.set(hero.position.x, position.y -hero.height);
+                } else if (hero.futurepos.y <= position.y) {
+                    hero.position.set(hero.position.x, position.y - hero.height);
                     hero.hitbox.setPosition(hero.position);
                 } else {
                     hero.position.x = position.x - hero.width;
@@ -53,12 +55,17 @@ public class Platform extends Scrollable {
 
     }
 
+    public void addStars(){
+
+    }
+
 
     public void reset(int newX, int newY) {
         super.reset(newX);
         position.y = newY;
         Random r = new Random();
         width = 300 + r.nextInt(800);
+        hitbox.setPosition(position);
         hitbox.width = width;
         inDanger = true;
 
@@ -79,16 +86,26 @@ public class Platform extends Scrollable {
 
         if(!isVisible){
          //   world.SCORE++;
-
             Random r = new Random();
             int signal = (int) Math.pow(-1,r.nextInt());
             int offset = r.nextInt(10) * signal;
+            int newY = (int) (position.y + offset);
 
             if(position.y < 0) {
-                reset(world.maxInterval(this),(int) position.y + offset);
+                if(newY < - 90){
+                    newY = -90;
+                } else if(newY > -60){
+                    newY = -60;
+                }
+                reset(world.maxInterval(this),newY);
                 world.lastResetLow = this;
             } else {
-                reset(world.maxInterval(this),(int) position.y + offset);
+                if(newY < 325){
+                    newY = 325;
+                } else if(newY > 355){
+                    newY = 355;
+                }
+                reset(world.maxInterval(this),newY);
                 world.lastResetHigh = this;
 
             }

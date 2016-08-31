@@ -2,6 +2,7 @@ package com.jtbgame;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
@@ -11,7 +12,9 @@ import java.util.Random;
 public class GameWorld {
     float elapsed;
     Hero hero;
+    Glue glue;
     ArrayList<Platform> plats = new ArrayList<>();
+    ArrayList<Lane> lanes = new ArrayList<>();
     Platform lastResetHigh;
     Platform lastResetLow;
     float GAMESPEED = 300;
@@ -21,12 +24,24 @@ public class GameWorld {
     Spike spike;
     Spike otherspike;
     int lastelapsedScore;
+    int activeObjects = 0;
+    Random r = new Random();
+    boolean spikeOrGlue = true;
 
     public GameWorld(){
-        hero = new Hero(35,35,30,30,this);
+        hero = new Hero(120,35,30,30,this);
+        int pos = 90;
         for(int i = 0; i < 5; i++){
-            Platform plat = new Platform(i*300,-30,300,50,2,i,this);
-            Platform platUP = new Platform(i*300,345,300,50,2,i,this);
+            Lane lane = new Lane(pos, this, i);
+            lanes.add(lane);
+            pos+=40;
+
+        }
+
+        for(int i = 0; i < 5; i++){
+            Platform plat = new Platform(i*300,-80,300,100,2,i,this);
+            Platform platUP = new Platform(i*300,345,300,100,2,i,this);
+            hero.currentplat = plat;
             plats.add(plat);
             plats.add(platUP);
             platUP.upDown = true;
@@ -34,12 +49,15 @@ public class GameWorld {
             lastResetHigh = platUP;
             lastResetLow = plat;
         }
-        spike = new Spike(700,150,100,30,300,this);
-        otherspike = new Spike(1150,100,100,30,300,this);
+        glue = new Glue(-999,200,100,30,-150,this);
+        //lanes.get(0).setItem(glue);
+        spike = new Spike(-700,300,100,30,300,this);
+        spike.id = 1;
+        otherspike = new Spike(-1150,400,100,30,300,this);
+        otherspike.id = 2;
     }
 
     public int maxInterval(Platform platform){
-        Random r = new Random();
         int last;
         if(platform.position.y < 0){
             last = (int) lastResetLow.position.x + lastResetLow.width;
@@ -47,11 +65,11 @@ public class GameWorld {
             last = (int) lastResetHigh.position.x + lastResetHigh.width;
         }
 
-        int offset = (60 + r.nextInt(60));
+        int offset = (60 + r.nextInt(150));
         int signal = (int) Math.pow(-1,r.nextInt());
        // offset *= signal;
-        if(hero.elapsed > 5 && platform.upDown == hero.upDown){
-            offset = 400;
+        if(hero.elapsed > 3.5 && platform.upDown == hero.upDown){
+            offset = 600;
             hero.elapsed = 0;
         }
 
@@ -68,15 +86,44 @@ public class GameWorld {
         }
     }
 
+    public Lane getEmptyLane(){
+        Lane empty;
+        empty = lanes.get(r.nextInt(5));
+       // System.out.println( contains(Lane.previous,empty.id));
+        if(empty == null || contains(Lane.previous,empty.id)){
+            getEmptyLane();
+        }
+        return empty;
+    }
+
 
     public void update(float delta) {
-        GAMESPEED += 0.01f;
+
+
+        GAMESPEED += 0.025;
         elapsed += delta;
         hero.update(delta);
-        if(SCORE >= 5) {
-            spike.update(delta);
-            otherspike.update(delta);
+        for (Lane l : lanes){
+           l.update();
         }
+        if(SCORE >= 0){
+           glue.update(delta);
+        }
+
+        if(SCORE >= 10) {
+            spike.update(delta);
+            if(SCORE >= 15) {
+                otherspike.update(delta);
+            }
+
+        }
+
+        if(SCORE >= 25){
+            if(SCORE % 10 == 0){
+                spikeOrGlue = !spikeOrGlue;
+            }
+        }
+
         for (Platform p : plats){
             p.update(delta);
         }
@@ -84,6 +131,15 @@ public class GameWorld {
             lastelapsedScore = (int) elapsed;
             SCORE++;
         }
+    }
+
+    private boolean contains(int arr[], int a){
+        for(int i = 0; i < arr.length; i++){
+            if(arr[i] ==  a){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

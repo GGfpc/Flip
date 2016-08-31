@@ -20,7 +20,7 @@ public class ColorSchemeManager {
     int lastUpdate = 0;
     GameWorld world;
     float elapsed;
-
+    float currentluminance;
 
 
     public void addScheme(int name, ColorScheme scheme){
@@ -32,6 +32,7 @@ public class ColorSchemeManager {
         this.current = current;
         updating.plat = current.plat.cpy();
         updating.bg = current.bg.cpy();
+        currentluminance = (0.299f*current.bg.r + 0.587f*current.bg.g + 0.114f*current.bg.b);
     }
 
     public ColorScheme getRandom(){
@@ -53,18 +54,18 @@ public class ColorSchemeManager {
     }
 
     public void updateScheme(){
-       System.out.println(updating.plat);
+        currentluminance = (0.299f*updating.bg.r + 0.587f*updating.bg.g + 0.114f*updating.bg.b);
         if(elapsed <= 6) {
-            updating.bg.lerp(desired.bg, 0.1f);
-            updating.plat.lerp(desired.plat, 0.1f);
+            updating.bg.lerp(desired.bg, 0.05f);
+            updating.plat.lerp(desired.plat, 0.05f);
             elapsed+= Gdx.graphics.getDeltaTime();
-        } else if(world.SCORE % 3 == 0 && world.SCORE != lastUpdate){
+        } else if(world.SCORE % 5 == 0 && world.SCORE != lastUpdate){
             elapsed = 0;
             currentKey++;
             lastUpdate = world.SCORE;
             setCurrent(desired);
             desired = getRandom();
-            System.out.println(current.name + " - " + desired.name);
+
         }
 
     }

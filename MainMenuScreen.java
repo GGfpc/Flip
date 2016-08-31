@@ -37,8 +37,8 @@ public class MainMenuScreen implements Screen {
         camera.update();
         game.batch.begin();
         game.batch.setProjectionMatrix(camera.combined);
-        game.font.draw(game.batch, "Hello!", 100, 150);
-        game.font.draw(game.batch, "Press SPACE to Start and T to retry the tutorial", 100, 100);
+        game.font.draw(game.batch, "PINK is STICKY | RED is SPIKY", 100, 170);
+        game.font.draw(game.batch, "Press SPACE to Start | SPACE to FLIP | UP to JUMP", 100, 100);
         game.batch.end();
 
 

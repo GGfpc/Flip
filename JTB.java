@@ -31,6 +31,7 @@ public class JTB extends Game {
             prf.putInteger("BEST", 0);
         }
         prf.flush();
+
         this.setScreen(new MainMenuScreen(this));
 
     }
