@@ -3,7 +3,6 @@ package com.jtbgame;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.sun.xml.internal.bind.v2.TODO;
 
 import java.util.Random;
 
@@ -21,6 +20,7 @@ public class Platform extends Scrollable {
     Vector2 inters = new Vector2(0, 0);
     Rectangle intersection = new Rectangle();
     boolean upDown;
+    Random r = new Random();
 
     public Platform(int x, int y, int width, int height, float scrollspeed, int id, GameWorld world) {
         super(x, y, width, height, scrollspeed);
@@ -56,7 +56,20 @@ public class Platform extends Scrollable {
     }
 
     public void addStars(){
+        int amount = r.nextInt(4);
+        float lastpos = position.x + 100;
+        float ypos = 0;
 
+        for(int i = 0; i <= amount; i++){
+            if(upDown){
+                ypos = position.y - 25 - 5;
+            } else {
+                ypos = position.y + height + 5;
+            }
+            Collectible c = new Collectible((int)lastpos,(int)ypos,20,20,100,this);
+            world.collectibles.add(c);
+            lastpos += 40;
+        }
     }
 
 
@@ -68,6 +81,9 @@ public class Platform extends Scrollable {
         hitbox.setPosition(position);
         hitbox.width = width;
         inDanger = true;
+        if(upDown != world.hero.upDown && r.nextInt() % 2 == 0) {
+            addStars();
+        }
 
     }
 

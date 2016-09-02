@@ -15,6 +15,7 @@ public class GameWorld {
     Glue glue;
     ArrayList<Platform> plats = new ArrayList<>();
     ArrayList<Lane> lanes = new ArrayList<>();
+    ArrayList<Collectible> collectibles = new ArrayList<>();
     Platform lastResetHigh;
     Platform lastResetLow;
     float GAMESPEED = 300;
@@ -24,7 +25,8 @@ public class GameWorld {
     Spike spike;
     Spike otherspike;
     int lastelapsedScore;
-    int activeObjects = 0;
+    int collected;
+    int activeObjects;
     Random r = new Random();
     boolean spikeOrGlue = true;
 
@@ -106,8 +108,12 @@ public class GameWorld {
         for (Lane l : lanes){
            l.update();
         }
-        if(SCORE >= 0){
+        if(SCORE >= 5){
            glue.update(delta);
+        }
+
+        for(Collectible c : collectibles){
+            c.update(delta);
         }
 
         if(SCORE >= 10) {

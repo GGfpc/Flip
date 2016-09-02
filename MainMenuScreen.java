@@ -31,17 +31,19 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(235 / 255.0f, 245 / 255.0f, 223 / 255.0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
         game.batch.begin();
         game.batch.setProjectionMatrix(camera.combined);
-        game.font.draw(game.batch, "PINK is STICKY | RED is SPIKY", 100, 170);
-        game.font.draw(game.batch, "Press SPACE to Start | SPACE to FLIP | UP to JUMP", 100, 100);
+        game.font.getData().setScale(1.5f);
+        game.font.setColor(1, 1, 1, 1);
+        game.font.draw(game.batch, "FLIP!", 160, 390);
+        game.font.getData().setScale(0.13f);
+        game.font.setColor(237 / 255.0f, 180 / 255.0f, 88 / 255.0f, 1);
+        game.font.draw(game.batch, "PRESS SPACE TO START | SPACE TO FLIP | UP TO JUMP | P TO PAUSE", 80, 100);
         game.batch.end();
-
-
 
         if(Gdx.input.isTouched() || Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             game.setScreen(new GameScreen(game));

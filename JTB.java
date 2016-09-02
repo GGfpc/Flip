@@ -22,15 +22,8 @@ public class JTB extends Game {
     public void create() {
 
         batch = new SpriteBatch();
-        font = new BitmapFont();
+        font =  new BitmapFont(Gdx.files.internal("munto.fnt"));
         Preferences prf = Gdx.app.getPreferences("JTB");
-        if(!prf.contains("Tutorial")) {
-            prf.putInteger("Tutorial", 1);
-        }
-        if(!prf.contains("BEST")) {
-            prf.putInteger("BEST", 0);
-        }
-        prf.flush();
 
         this.setScreen(new MainMenuScreen(this));
 

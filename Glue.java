@@ -96,6 +96,7 @@ public class Glue extends Scrollable {
                 } else if(hero.futurepos.y <= position.y ) {
                     world.hero.position.set(inters.x,position.y - world.hero.height);
                     hero.upDown = true;
+                } else {
                 }
             }
 

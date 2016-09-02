@@ -50,121 +50,7 @@ public class Hero {
         tmp = new Vector2(0,0);
         this.world = world;
 
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(new GestureDetector(new GestureDetector.GestureListener() {
-            @Override
-            public boolean touchDown(float x, float y, int pointer, int button) {
-               return false;
-            }
 
-            @Override
-            public boolean tap(float x, float y, int count, int button) {
-                jump();
-                System.out.println("jump");
-                return true;
-            }
-
-            @Override
-            public boolean longPress(float x, float y) {
-                return false;
-            }
-
-            @Override
-            public boolean fling(float velocityX, float velocityY, int button) {
-                System.out.println("fling");
-               /* if (Math.abs(velocityX) < Math.abs(velocityY)) {
-                    if (velocityY < 0 && !upDown) {
-                        flip();
-                        System.out.println("flipDown");
-                    } else if (velocityY > 0 && upDown) {
-                        flip();
-                        System.out.println("flipUp");
-                    }
-                }*/
-
-                flip();
-                return true;
-            }
-
-            //<editor-fold desc="Description">
-            @Override
-            public boolean pan(float x, float y, float deltaX, float deltaY) {
-                return false;
-            }
-
-            @Override
-            public boolean panStop(float x, float y, int pointer, int button) {
-                return false;
-            }
-
-            @Override
-            public boolean zoom(float initialDistance, float distance) {
-                return false;
-            }
-
-            @Override
-            public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-                return false;
-            }
-
-            @Override
-            public void pinchStop() {
-
-            }
-            //</editor-fold>
-        }));
-
-        multiplexer.addProcessor(new InputProcessor() {
-            @Override
-            public boolean keyDown(int keycode) {
-                if(keycode == Input.Keys.SPACE){
-                    flip();
-                    return true;
-                }
-                if(keycode == Input.Keys.UP){
-                    jump();
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean keyUp(int keycode) {
-               return false;
-            }
-
-            @Override
-            public boolean keyTyped(char character) {
-                return false;
-            }
-
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                return false;
-            }
-
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                return false;
-            }
-
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                return false;
-            }
-
-            @Override
-            public boolean mouseMoved(int screenX, int screenY) {
-                return false;
-            }
-
-            @Override
-            public boolean scrolled(int amount) {
-                return false;
-            }
-        });
-
-        Gdx.input.setInputProcessor(multiplexer);
 
 
     }
@@ -226,6 +112,14 @@ public class Hero {
 
         for(Platform plat : world.plats){
             plat.checkHeroColision(this);
+        }
+
+        for(Collectible c : world.collectibles){
+            if(c.collides(this)){
+                c.hit = true;
+                c.position.y = 5000;
+                world.collected++;
+            }
         }
 
         if(position.x > currentplat.position.x + currentplat.width && !isStuck){
