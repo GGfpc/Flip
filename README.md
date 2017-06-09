@@ -1,9 +1,9 @@
 # Flip
 
-#Tell Me About it
+# Tell Me About it
 Flip is a 2D Game written in JAVA with LibGDX
 
-#That sounds cool! What does it do?
+# That sounds cool! What does it do?
 It's a 2D endless runner with a twist...literally.
 You can flip gravity to avoid obstacles and jump over gaps.
 It has:
@@ -15,18 +15,18 @@ It has:
   - Different color styles
   - Other surprises
 
-#Can I see it?
+# Can I see it?
 
-###Spikey
+### Spikey
 ![](http://i.imgur.com/QJ0Hdej.png)
 
-###GameOver
+### GameOver
 ![](http://i.imgur.com/fhmyTwQ.png)
 
-###Portal
+### Portal
 ![](http://i.imgur.com/aTGUcvq.png?1)
 
-#Can I play it?
+# Can I play it?
 
 Hell yeah! You can play it right [Here](https://ggfpc.github.io).
 Keep in mind this version will always be slightly behind development.
