@@ -28,7 +28,7 @@ It has:
 
 # Can I play it?
 
-Hell yeah! You can play it right [Here](https://ggfpc.github.io).
+Hell yeah! You can play it right [Here](https://goncalogarcia.me/flip).
 Keep in mind this version will always be slightly behind development.
 As always, suggestions are apprectiated.
 
